@@ -20,6 +20,6 @@
 Clone the repository and install the required packages:
 
 ```bash
-git clone https://github.com/yourusername/indigo-cargo-tracker.git
+git clone git@github.com:manishdevX/indigo-cargo-tracker.git
 cd indigo-cargo-tracker
 pip install -r requirements.txt
