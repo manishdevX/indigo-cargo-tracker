@@ -1,6 +1,8 @@
+import os
+import json
 import pandas as pd
-from bs4 import BeautifulSoup
-from config import AWB_FILE_PATH
+from config import AWB_FILE_PATH, RESULT_FILE_PATH, RESULT_FILE_FORMAT
+
 
 def load_awb_data():
     """
@@ -42,8 +44,45 @@ def process_airwaybills():
     return airwaybills
 
 
-def process_response(response):
-    soup = BeautifulSoup(response.content, "html.parser")
-    # Extract status history table
-    s = soup.find("table", id="GridViewAwbTracking")
-    print("s is ",s.prettify())
+def handle_result_storage(result):
+    print("result len ", len(result))
+    if not RESULT_FILE_PATH:
+        os.makedirs("../results", exist_ok=True)
+        path = os.path.join("../results", f"output.{RESULT_FILE_FORMAT}")
+    else:
+        path = os.path.join(RESULT_FILE_PATH, f"output.{RESULT_FILE_FORMAT}")
+
+    parsed_data = []
+
+    for data in result:
+        rows = data.find_all("tr")[1:]
+        for row in rows:
+            cols = [ele.text.strip() for ele in row.find_all("td")]
+            parsed_data.append(
+                {
+                    "Station": cols[0],
+                    "Milestone": cols[1],
+                    "Pcs": cols[2],
+                    "Weight": cols[3],
+                    "Flight#": cols[4],
+                    "Flight Date": cols[5],
+                    "Org": cols[6],
+                    "Dest": cols[7],
+                    "ULD": cols[8],
+                    "Event Date-Time": cols[9],
+                }
+            )
+
+    df = pd.DataFrame(parsed_data)
+
+    if RESULT_FILE_FORMAT == "csv":
+        df.to_csv(path, index=False)
+    elif RESULT_FILE_FORMAT in ["xls", "xlsx"]:
+        df.to_excel(path, index=False)
+    elif RESULT_FILE_FORMAT == "json":
+        with open(path, "w") as f:
+            json.dump(parsed_data, f, indent=4)
+    else:
+        raise ValueError(
+            f'Unsupported file format "{RESULT_FILE_FORMAT}". Allowed file formats are csv, xls, xlsx and json.'
+        )

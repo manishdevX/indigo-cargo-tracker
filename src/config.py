@@ -7,5 +7,7 @@ env = dotenv_values()
 AWB_FILE_PATH = env.get("AWB_FILE_PATH", None)
 PREFIX = env.get("PREFIX")
 TRACK_URL = env.get("TRACK_URL")
-OUTPUT_FILE_PATH = env.get("OUTPUT_FILE_PATH")
-OUTPUT_FILE_FORMAT = env.get("OUTPUT_FILE_FORMAT")
+RESULT_STORAGE_ENABLED = env.get("RESULT_STORAGE_ENABLED", "true") == "true"
+RESULT_FILE_FORMAT = env.get("RESULT_FILE_FORMAT", "csv")
+RESULT_FILE_PATH = env.get("RESULT_FILE_PATH")
+RESULT_EMAIL_ENABLED = env.get("RESULT_EMAIL_ENABLED", "false") == "true"
