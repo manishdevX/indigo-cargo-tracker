@@ -1,21 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
+from config import TRACK_URL, PREFIX
 
 
-def scrap_tracking_info(airwaybills, prefix, track_url):
+def scrap_tracking_info(airwaybills):
     result = []
     for awb in airwaybills:
         session = requests.session()
-        response = session.get(track_url)
+        response = session.get(TRACK_URL)
         soup = BeautifulSoup(response.content, "html.parser")
 
         payload = {
             "__VIEWSTATE": soup.find("input", {"name": "__VIEWSTATE"}).get("value"),
-            "txtPrefix": prefix,
+            "txtPrefix": PREFIX,
             "TextBoxAWBno": awb,
         }
 
-        response = session.post(track_url, data=payload)
+        response = session.post(TRACK_URL, data=payload)
         soup = BeautifulSoup(response.content, "html.parser")
 
         # Extract status history table

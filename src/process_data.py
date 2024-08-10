@@ -44,16 +44,8 @@ def process_airwaybills():
     return airwaybills
 
 
-def handle_result_storage(result):
-    print("result len ", len(result))
-    if not RESULT_FILE_PATH:
-        os.makedirs("../results", exist_ok=True)
-        path = os.path.join("../results", f"output.{RESULT_FILE_FORMAT}")
-    else:
-        path = os.path.join(RESULT_FILE_PATH, f"output.{RESULT_FILE_FORMAT}")
-
+def process_result(result):
     parsed_data = []
-
     for data in result:
         rows = data.find_all("tr")[1:]
         for row in rows:
@@ -72,8 +64,17 @@ def handle_result_storage(result):
                     "Event Date-Time": cols[9],
                 }
             )
+    return parsed_data
 
-    df = pd.DataFrame(parsed_data)
+
+def handle_result_storage(result):
+    if not RESULT_FILE_PATH:
+        os.makedirs("../results", exist_ok=True)
+        path = os.path.join("../results", f"output.{RESULT_FILE_FORMAT}")
+    else:
+        path = os.path.join(RESULT_FILE_PATH, f"output.{RESULT_FILE_FORMAT}")
+
+    df = pd.DataFrame(result)
 
     if RESULT_FILE_FORMAT == "csv":
         df.to_csv(path, index=False)
@@ -81,7 +82,7 @@ def handle_result_storage(result):
         df.to_excel(path, index=False)
     elif RESULT_FILE_FORMAT == "json":
         with open(path, "w") as f:
-            json.dump(parsed_data, f, indent=4)
+            json.dump(result, f, indent=4)
     else:
         raise ValueError(
             f'Unsupported file format "{RESULT_FILE_FORMAT}". Allowed file formats are csv, xls, xlsx and json.'
