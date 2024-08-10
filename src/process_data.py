@@ -1,6 +1,6 @@
 import pandas as pd
+from bs4 import BeautifulSoup
 from config import AWB_FILE_PATH
-
 
 def load_awb_data():
     """
@@ -40,3 +40,10 @@ def process_airwaybills():
     airwaybills = load_awb_data()
     validate_airwaybills(airwaybills)
     return airwaybills
+
+
+def process_response(response):
+    soup = BeautifulSoup(response.content, "html.parser")
+    # Extract status history table
+    s = soup.find("table", id="GridViewAwbTracking")
+    print("s is ",s.prettify())

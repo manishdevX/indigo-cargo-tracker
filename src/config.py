@@ -5,4 +5,7 @@ env = dotenv_values()
 
 # Define configuration variables
 AWB_FILE_PATH = env.get("AWB_FILE_PATH", None)
-CHUNK_SIZE = env.get("CHUNK_SIZE", 10)
+PREFIX = env.get("PREFIX")
+TRACK_URL = env.get("TRACK_URL")
+OUTPUT_FILE_PATH = env.get("OUTPUT_FILE_PATH")
+OUTPUT_FILE_FORMAT = env.get("OUTPUT_FILE_FORMAT")
