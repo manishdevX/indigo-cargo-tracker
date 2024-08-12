@@ -5,8 +5,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from process_data import process_airwaybills, handle_result_storage, process_result
-from scrapper import scrap_tracking_info
+from process_data import load_awb_data, handle_result_storage, process_result
+from src.scraper import scrap_tracking_info
 from config import (
     RESULT_STORAGE_ENABLED,
     RESULT_EMAIL_ENABLED,
@@ -23,9 +23,9 @@ def send_email(result):
     msg = MIMEMultipart()
     msg["From"] = SENDER_EMAIL
     msg["To"] = RECIPIENT_EMAILS
-    msg["Subject"] = "Processed Airway Bill Data"
+    msg["Subject"] = "Processed Air wayBill Data"
 
-    body = "Please find the attached processed data."
+    body = "Please find the attached tracking data."
     msg.attach(MIMEText(body, "plain"))
 
     buffer = BytesIO()
@@ -61,7 +61,7 @@ def send_email(result):
 
 
 def main():
-    airwaybills = process_airwaybills()
+    airwaybills = load_awb_data()
     result = scrap_tracking_info(airwaybills)
     parsed_result = process_result(result)
 

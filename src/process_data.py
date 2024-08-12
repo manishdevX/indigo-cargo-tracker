@@ -4,44 +4,40 @@ import pandas as pd
 from config import AWB_FILE_PATH, RESULT_FILE_PATH, RESULT_FILE_FORMAT
 
 
+def get_valid_airwaybills(df):
+    valid_list = []
+    for col in df.columns:
+        df[col] = df[col].astype(str)
+        valid_bills = [awb for awb in df[col] if len(awb) == 8 and awb.isdigit()]
+        valid_list.extend(valid_bills)
+
+    return valid_list
+
+
 def load_awb_data():
     """
     Load air waybill data from the specified file path in the config.
     If no path is provided, prompt the user for comma-separated input of air waybill.
     """
     if AWB_FILE_PATH:
+        awb_list = []
         ext = AWB_FILE_PATH.split(".")[-1].lower()
         if ext == "csv":
             df = pd.read_csv(AWB_FILE_PATH)
+            awb_list = get_valid_airwaybills(df)
         elif ext in ["xls", "xlsx"]:
-            df = pd.read_excel(AWB_FILE_PATH)
+            excel_file = pd.ExcelFile(AWB_FILE_PATH)
+            for sheet_name in excel_file.sheet_names:
+                df = pd.read_excel(excel_file, sheet_name=sheet_name)
+                valid_bills = get_valid_airwaybills(df)
+                awb_list.extend(valid_bills)
         else:
             raise ValueError("Unsupported file format. Please use a CSV or Excel file.")
-
-        awb_list = df["AirwayBill"].tolist()
     else:
         awb_data = input("Enter Indigo Air Waybills (space-separated): ")
         awb_list = awb_data.split(" ")
 
     return awb_list
-
-
-def validate_airwaybills(airwaybills):
-    """
-    Validate that the air waybills contain only numeric values.
-    """
-    for bill in airwaybills:
-        if not bill.isdigit():
-            raise ValueError(f'Invalid AWB Number "{bill}". Please enter numbers only')
-
-
-def process_airwaybills():
-    """
-    Process the airway bills by loading, validating, and returning them.
-    """
-    airwaybills = load_awb_data()
-    validate_airwaybills(airwaybills)
-    return airwaybills
 
 
 def process_result(result):
@@ -58,8 +54,8 @@ def process_result(result):
                     "Weight": cols[3],
                     "Flight#": cols[4],
                     "Flight Date": cols[5],
-                    "Org": cols[6],
-                    "Dest": cols[7],
+                    "Origin": cols[6]},
+                    "Destination": cols[7],
                     "ULD": cols[8],
                     "Event Date-Time": cols[9],
                 }
