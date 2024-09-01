@@ -42,19 +42,20 @@ def load_awb_data():
 
 def process_result(result):
     parsed_data = []
-    for data in result:
+    for awb, data in result:
         rows = data.find_all("tr")[1:]
         for row in rows:
             cols = [ele.text.strip() for ele in row.find_all("td")]
             parsed_data.append(
                 {
+                    "AirWayBill": awb,
                     "Station": cols[0],
                     "Milestone": cols[1],
                     "Pcs": cols[2],
                     "Weight": cols[3],
-                    "Flight#": cols[4],
+                    "Flight": cols[4],
                     "Flight Date": cols[5],
-                    "Origin": cols[6]},
+                    "Origin": cols[6],
                     "Destination": cols[7],
                     "ULD": cols[8],
                     "Event Date-Time": cols[9],

@@ -1,11 +1,13 @@
 import requests
+import time
+import random
 from bs4 import BeautifulSoup
 from config import TRACK_URL, PREFIX
 
 
 def scrap_tracking_info(airwaybills):
     result = []
-    for awb in airwaybills:
+    for ind, awb in enumerate(airwaybills):
         session = requests.session()
         response = session.get(TRACK_URL)
         soup = BeautifulSoup(response.content, "html.parser")
@@ -21,6 +23,10 @@ def scrap_tracking_info(airwaybills):
 
         # Extract status history table
         status_history = soup.find("table", id="GridViewAwbTracking")
-        result.append(status_history)
+        result.append((awb, status_history))
+
+        # Add random sleep for every 10 requests to avoid rate limiting blocking
+        if (ind + 1) % 10 == 0:
+            time.sleep(random.randint(1, 3))
 
     return result
